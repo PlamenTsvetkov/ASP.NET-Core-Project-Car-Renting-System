@@ -9,6 +9,8 @@ namespace CarRentingSystem
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
 
+    using CarRentingSystem.Infrastucture;
+
     public class Startup
     {
         public Startup(IConfiguration configuration) 
@@ -19,7 +21,7 @@ namespace CarRentingSystem
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddDbContext<ApplicationDbContext>(options =>options
+                .AddDbContext<CarRentingDbContext>(options =>options
                     .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services
@@ -34,7 +36,7 @@ namespace CarRentingSystem
                     options.Password.RequireUppercase = false;
 
                 })
-                    .AddEntityFrameworkStores<ApplicationDbContext>();
+                    .AddEntityFrameworkStores<CarRentingDbContext>();
 
             services
                 .AddControllersWithViews();
@@ -43,6 +45,7 @@ namespace CarRentingSystem
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.PrepareDatabase();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
