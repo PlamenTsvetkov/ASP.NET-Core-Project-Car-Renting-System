@@ -1,9 +1,19 @@
-namespace CarRentingSystem.Data.Models
+using System;
+
+namespace CarRentingSystem.Data
 {
 
     public class DataConstant
     {
+        public const int CarBrandMinLength = 2;
         public const int CarBrandMaxLength = 20;
+
+        public const int CarModelMinLength = 2;
         public const int CarModelMaxLength = 30;
+
+        public const int CarDescriptionMinLength = 6;
+
+        public const int CarYearMinValue = 1990;
+        public  const int CarYearMaxValue = 2030;
     }
 }
