@@ -12,20 +12,32 @@ namespace CarRentingSystem.Controllers
     {
         private readonly CarRentingDbContext data;
 
-        public CarsController(CarRentingDbContext data) 
+        public CarsController(CarRentingDbContext data)
             => this.data = data;
 
-        public IActionResult Add() 
+        public IActionResult Add()
             => View(new AddCarFormModel
-                 {
-                     Categories = this.GetCarCategories()
-                 });
+            {
+                Categories = this.GetCarCategories()
+            });
 
-        public IActionResult All()
+        public IActionResult All(string brand, string searchTerm)
         {
-            var cars = this.data
-                .Cars
-                .OrderByDescending(c=>c.Id)
+            var carQuery = this.data.Cars.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(brand))
+            {
+                carQuery = carQuery.Where(c => c.Brand == brand);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                //in order to work well, the string must be splitted and each one must be looked for separately
+                carQuery = carQuery.Where(c =>
+                 (c.Brand + " " + c.Model).ToLower().Contains(searchTerm.ToLower())
+                || c.Description.ToLower().Contains(searchTerm.ToLower()));
+            }
+            var cars = carQuery
+                .OrderByDescending(c => c.Id)
                 .Select(c => new CarListingViewModela
                 {
                     Id = c.Id,
@@ -37,14 +49,26 @@ namespace CarRentingSystem.Controllers
                 })
                 .ToList();
 
-            return View(cars);
+            var carBrands = this.data
+                .Cars
+                .Select(c => c.Brand)
+                .Distinct()
+                .OrderBy(br => br)
+                .ToList();
+
+            return View(new AllCarsQueryModel
+            {
+                Brands=carBrands,
+                Cars = cars,
+                SearchTerm = searchTerm
+            });
         }
 
 
-       [HttpPost]
-       public IActionResult Add(AddCarFormModel car)
+        [HttpPost]
+        public IActionResult Add(AddCarFormModel car)
         {
-            if (!this.data.Categories.Any(c=>c.Id==car.CategoryId))
+            if (!this.data.Categories.Any(c => c.Id == car.CategoryId))
             {
                 this.ModelState.TryAddModelError(nameof(car.CategoryId), "Category does not exist.");
             }
@@ -69,15 +93,15 @@ namespace CarRentingSystem.Controllers
             this.data.SaveChanges();
 
             return RedirectToAction(nameof(All));
-            
+
         }
         private IEnumerable<CarCategoryViewModel> GetCarCategories()
                 => this.data
                  .Categories
                  .Select(c => new CarCategoryViewModel
                  {
-                     Id=c.Id,
-                     Name=c.Name
+                     Id = c.Id,
+                     Name = c.Name
                  })
                  .ToList();
     }

@@ -13,6 +13,7 @@ namespace CarRentingSystem
 
     public class Startup
     {
+        //46min
         public Startup(IConfiguration configuration) 
             => Configuration = configuration;
 
