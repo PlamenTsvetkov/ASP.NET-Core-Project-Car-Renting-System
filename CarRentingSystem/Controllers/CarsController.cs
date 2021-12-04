@@ -41,7 +41,7 @@ namespace CarRentingSystem.Controllers
                 CarSorting.DateCreated or _ => carQuery.OrderByDescending(c=>c.Id)
             };
 
-            var totalCars = this.data.Cars.Count();
+            var totalCars = carQuery.Count();
 
             var cars = carQuery
                 .Skip((query.CurrentPage-1)*AllCarsQueryModel.CarsPerPage)
