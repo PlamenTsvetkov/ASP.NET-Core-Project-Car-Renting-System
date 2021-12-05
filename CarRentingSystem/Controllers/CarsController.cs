@@ -7,6 +7,8 @@ namespace CarRentingSystem.Controllers
     using CarRentingSystem.Data;
     using System.Linq;
     using CarRentingSystem.Data.Models;
+    using Microsoft.AspNetCore.Authorization;
+    using CarRentingSystem.Infrastucture;
 
     public class CarsController : Controller
     {
@@ -70,16 +72,29 @@ namespace CarRentingSystem.Controllers
 
             return View(query);
         }
-
+        [Authorize]
         public IActionResult Add()
-          => View(new AddCarFormModel
-          {
-              Categories = this.GetCarCategories()
-          });
+        {
+            if (this.UserIdDealer())
+            {
+                return RedirectToAction(nameof(DealersController.Create), "Dealers");
+            }
+
+            return View(new AddCarFormModel
+                {
+                    Categories = this.GetCarCategories()
+                });
+        }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Add(AddCarFormModel car)
         {
+            if (this.UserIdDealer())
+            {
+                return RedirectToAction(nameof(DealersController.Create), "Dealers");
+            }
+
             if (!this.data.Categories.Any(c => c.Id == car.CategoryId))
             {
                 this.ModelState.TryAddModelError(nameof(car.CategoryId), "Category does not exist.");
@@ -107,6 +122,11 @@ namespace CarRentingSystem.Controllers
             return RedirectToAction(nameof(All));
 
         }
+        private bool UserIdDealer()
+            => !this.data
+                .Dealers
+                .Any(d => d.UserId == this.User.GetId());
+
         private IEnumerable<CarCategoryViewModel> GetCarCategories()
                 => this.data
                  .Categories
