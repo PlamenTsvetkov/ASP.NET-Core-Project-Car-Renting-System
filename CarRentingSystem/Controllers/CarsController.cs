@@ -17,9 +17,9 @@ namespace CarRentingSystem.Controllers
         public CarsController(CarRentingDbContext data)
             => this.data = data;
 
-      
 
-        public IActionResult All([FromQuery]AllCarsQueryModel query)
+
+        public IActionResult All([FromQuery] AllCarsQueryModel query)
         {
             var carQuery = this.data.Cars.AsQueryable();
 
@@ -40,13 +40,13 @@ namespace CarRentingSystem.Controllers
             {
                 CarSorting.Year => carQuery.OrderByDescending(c => c.Year),
                 CarSorting.BrandAndModel => carQuery.OrderBy(c => c.Brand).ThenBy(c => c.Model),
-                CarSorting.DateCreated or _ => carQuery.OrderByDescending(c=>c.Id)
+                CarSorting.DateCreated or _ => carQuery.OrderByDescending(c => c.Id)
             };
 
             var totalCars = carQuery.Count();
 
             var cars = carQuery
-                .Skip((query.CurrentPage-1)*AllCarsQueryModel.CarsPerPage)
+                .Skip((query.CurrentPage - 1) * AllCarsQueryModel.CarsPerPage)
                 .Take(AllCarsQueryModel.CarsPerPage)
                 .Select(c => new CarListingViewModela
                 {
@@ -75,24 +75,30 @@ namespace CarRentingSystem.Controllers
         [Authorize]
         public IActionResult Add()
         {
-            if (this.UserIdDealer())
+            if (this.UserIsDealer())
             {
-                return RedirectToAction(nameof(DealersController.Create), "Dealers");
+                return RedirectToAction(nameof(DealersController.Become), "Dealers");
             }
 
             return View(new AddCarFormModel
-                {
-                    Categories = this.GetCarCategories()
-                });
+            {
+                Categories = this.GetCarCategories()
+            });
         }
 
         [HttpPost]
         [Authorize]
         public IActionResult Add(AddCarFormModel car)
         {
-            if (this.UserIdDealer())
+            var dealerId = this.data
+                .Dealers
+                .Where(d => d.UserId == this.User.GetId())
+                .Select(d => d.Id)
+                .FirstOrDefault();
+
+            if (dealerId == 0)
             {
-                return RedirectToAction(nameof(DealersController.Create), "Dealers");
+                return RedirectToAction(nameof(DealersController.Become), "Dealers");
             }
 
             if (!this.data.Categories.Any(c => c.Id == car.CategoryId))
@@ -114,6 +120,7 @@ namespace CarRentingSystem.Controllers
                 ImageUrl = car.ImageUrl,
                 CategoryId = car.CategoryId,
                 Year = car.Year,
+                DealerId = dealerId
             };
 
             this.data.Cars.Add(carData);
@@ -122,7 +129,7 @@ namespace CarRentingSystem.Controllers
             return RedirectToAction(nameof(All));
 
         }
-        private bool UserIdDealer()
+        private bool UserIsDealer()
             => !this.data
                 .Dealers
                 .Any(d => d.UserId == this.User.GetId());

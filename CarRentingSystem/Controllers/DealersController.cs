@@ -17,11 +17,11 @@ namespace CarRentingSystem.Controllers
             => this.data = data;
 
         [Authorize]
-        public IActionResult Create() => View();
+        public IActionResult Become() => View();
 
         [Authorize]
         [HttpPost]
-        public IActionResult Create(BecomeDealerFormModel dealer)
+        public IActionResult Become(BecomeDealerFormModel dealer)
         {
             var userId = this.User.GetId();
 
