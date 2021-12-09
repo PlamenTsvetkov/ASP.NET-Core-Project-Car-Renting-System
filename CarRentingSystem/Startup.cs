@@ -10,6 +10,7 @@ namespace CarRentingSystem
     using Microsoft.Extensions.Hosting;
 
     using CarRentingSystem.Infrastucture;
+    using CarRentingSystem.Services.Statistics;
 
     public class Startup
     {
@@ -41,6 +42,8 @@ namespace CarRentingSystem
 
             services
                 .AddControllersWithViews();
+
+            services.AddTransient<IStatisticsService, StatisticsService>();
         }
 
         

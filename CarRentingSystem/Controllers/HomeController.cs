@@ -7,16 +7,24 @@
     using CarRentingSystem.Models;
     using CarRentingSystem.Data;
     using CarRentingSystem.Models.Home;
+    using CarRentingSystem.Services.Statistics;
 
     public class HomeController : Controller
     {
+        private readonly IStatisticsService statistics;
         private readonly CarRentingDbContext data;
 
-        public HomeController(CarRentingDbContext data)
-            => this.data = data;
+        public HomeController(
+            IStatisticsService statistics,
+            CarRentingDbContext data)
+        {
+            this.statistics = statistics;
+            this.data = data;
+        }
+
         public IActionResult Index()
         {
-            var totalCars = this.data.Cars.Count();
+          
 
             var cars = this.data
                .Cars
@@ -32,9 +40,12 @@
                .Take(3)
                .ToList();
 
+            var totalStatitics = this.statistics.Total();
+
             return View(new IndexViewModel
             {
-                TotalCars= totalCars,
+                TotalCars= totalStatitics.TotalCars,
+                TotalUsers= totalStatitics.TotalUsers,
                 Cars=cars
             });
         }
