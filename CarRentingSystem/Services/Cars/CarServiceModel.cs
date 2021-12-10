@@ -1,17 +1,18 @@
-using System.Runtime.InteropServices;
+namespace CarRentingSystem.Services.Cars
+{
 
-// In SDK-style projects such as this one, several assembly attributes that were historically
-// defined in this file are now automatically added during build and populated with
-// values defined in project properties. For details of which attributes are included
-// and how to customise this process see: https://aka.ms/assembly-info-properties
+    public class CarServiceModel
+    {
+        public int Id { get; init; }
 
+        public string Brand { get; init; }
 
-// Setting ComVisible to false makes the types in this assembly not visible to COM
-// components.  If you need to access a type in this assembly from COM, set the ComVisible
-// attribute to true on that type.
+        public string Model { get; init; }
 
-[assembly: ComVisible(false)]
+        public string ImageUrl { get; init; }
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM.
+        public int Year { get; init; }
 
-[assembly: Guid("f892df65-990a-4f94-9565-7bae7d3d5496")]
+        public string Category { get; init; }
+    }
+}
