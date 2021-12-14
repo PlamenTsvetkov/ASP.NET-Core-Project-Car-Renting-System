@@ -11,10 +11,11 @@ namespace CarRentingSystem
 
     using CarRentingSystem.Infrastucture;
     using CarRentingSystem.Services.Statistics;
+    using CarRentingSystem.Services.Cars;
 
     public class Startup
     {
-        //54min
+        //1.35min
         public Startup(IConfiguration configuration) 
             => Configuration = configuration;
 
@@ -44,6 +45,7 @@ namespace CarRentingSystem
                 .AddControllersWithViews();
 
             services.AddTransient<IStatisticsService, StatisticsService>();
+            services.AddTransient<ICarService, CarService>();
         }
 
         

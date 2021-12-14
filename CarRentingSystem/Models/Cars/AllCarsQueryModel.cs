@@ -1,7 +1,10 @@
 namespace CarRentingSystem.Models.Cars
 {
+
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+
+    using CarRentingSystem.Services.Cars;
 
     public class AllCarsQueryModel
     {
@@ -16,7 +19,7 @@ namespace CarRentingSystem.Models.Cars
 
         public int CurrentPage { get; set; } = 1;
 
-        public IEnumerable<CarListingViewModela> Cars { get; set; }
+        public IEnumerable<CarServiceModel> Cars { get; set; }
         public int TotalCar { get; set; }
 
     }
